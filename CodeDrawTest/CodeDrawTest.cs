@@ -8,7 +8,7 @@ namespace CodeDrawTest
 	{
 		private static void Main(string[] Args)
 		{
-			CodeDrawEventTest.MainEvent(Args);
+			//CodeDrawEventTest.MainEvent(Args);
 			//TriangleTest();
 			//FramePositionTest();
 			//LineSizeTest();

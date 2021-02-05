@@ -20,7 +20,7 @@ namespace CodeDrawTest
 			//MouseWheelTest();
 			//KeyEventTest((c, e) => c.KeyUp += e);
 			//KeyEventTest((c, e) => c.KeyPress += e);
-			KeyEventTest((c, e) => c.KeyDown += e);
+			//KeyEventTest((c, e) => c.KeyDown += e);
 			//WindowMoveTest();
 		}
 
@@ -73,8 +73,9 @@ namespace CodeDrawTest
 
 			cd.MouseWheel += (c, a) =>
 			{
-				c.Reset();
 				l += a.Delta / 5;
+
+				c.Reset();
 				c.DrawTriangle(200, 300, 400, 300, 300, 300 + l);
 				c.Show();
 			};

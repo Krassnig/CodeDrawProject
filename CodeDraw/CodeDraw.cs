@@ -317,11 +317,11 @@ namespace CodeDrawNS
 		/// </summary>
 		/// <param name="x">The center of the ellipse</param>
 		/// <param name="y">The center of the ellipse</param>
-		/// <param name="hradius"></param>
-		/// <param name="vradius"></param>
-		public void DrawEllipse(int x, int y, int hradius, int vradius)
+		/// <param name="horizontalRadius"></param>
+		/// <param name="verticalRadius"></param>
+		public void DrawEllipse(int x, int y, int horizontalRadius, int verticalRadius)
 		{
-			G.DrawEllipse(pen, x - hradius, y - vradius, 2 * hradius, 2 * vradius);
+			G.DrawEllipse(pen, x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius);
 		}
 
 		/// <summary>
@@ -329,11 +329,11 @@ namespace CodeDrawNS
 		/// </summary>
 		/// <param name="x">The center of the ellipse</param>
 		/// <param name="y">The center of the ellipse</param>
-		/// <param name="hradius"></param>
-		/// <param name="vradius"></param>
-		public void FillEllipse(int x, int y, int hradius, int vradius)
+		/// <param name="horizontalRadius"></param>
+		/// <param name="verticalRadius"></param>
+		public void FillEllipse(int x, int y, int horizontalRadius, int verticalRadius)
 		{
-			G.FillEllipse(brush, x - hradius, y - vradius, 2 * hradius, 2 * vradius);
+			G.FillEllipse(brush, x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius);
 		}
 
 		/// <summary>
@@ -341,13 +341,13 @@ namespace CodeDrawNS
 		/// </summary>
 		/// <param name="x">The center of the arc</param>
 		/// <param name="y">The center of the arc</param>
-		/// <param name="hradius"></param>
-		/// <param name="vradius"></param>
+		/// <param name="horizontalRadius"></param>
+		/// <param name="verticalRadius"></param>
 		/// <param name="startRadians">The starting angle. A 0 radians angle would be interpreted as starting at 12 o'clock going clock-wise.</param>
 		/// <param name="sweepRadians">The length of the arc in radians from the start angle in a clockwise direction.</param>
-		public void DrawArc(int x, int y, int hradius, int vradius, double startRadians, double sweepRadians)
+		public void DrawArc(int x, int y, int horizontalRadius, int verticalRadius, double startRadians, double sweepRadians)
 		{
-			G.DrawArc(pen, new Rectangle(x - hradius, y - vradius, 2 * hradius, 2 * vradius), transformStart(startRadians), transformSweep(sweepRadians));
+			G.DrawArc(pen, new Rectangle(x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius), transformStart(startRadians), transformSweep(sweepRadians));
 		}
 
 		/// <summary>
@@ -355,13 +355,13 @@ namespace CodeDrawNS
 		/// </summary>
 		/// <param name="x">The center of the arc</param>
 		/// <param name="y">The center of the arc</param>
-		/// <param name="hradius"></param>
-		/// <param name="vradius"></param>
+		/// <param name="horizontalRadius"></param>
+		/// <param name="verticalRadius"></param>
 		/// <param name="startRadians">The starting angle. A 0 radians angle would be interpreted as starting at 12 o'clock going clock-wise.</param>
 		/// <param name="sweepRadians">The length of the arc in radians from the start angle in a clockwise direction.</param>
-		public void FillArc(int x, int y, int hradius, int vradius, double startRadians, double sweepRadians)
+		public void FillArc(int x, int y, int horizontalRadius, int verticalRadius, double startRadians, double sweepRadians)
 		{
-			G.FillPie(brush, new Rectangle(x - hradius, y - vradius, 2 * hradius, 2 * vradius), transformStart(startRadians), transformSweep(sweepRadians));
+			G.FillPie(brush, new Rectangle(x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius), transformStart(startRadians), transformSweep(sweepRadians));
 		}
 
 		public void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
