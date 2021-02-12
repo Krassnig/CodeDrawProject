@@ -1,6 +1,7 @@
 ﻿using CodeDrawNS;
 using System;
 using System.Drawing;
+using System.Threading;
 
 namespace CodeDrawTest
 {
@@ -31,6 +32,22 @@ namespace CodeDrawTest
 			//CornerTest();
 			//AnimationTest();
 			//ProofOfConcept();
+			AutoCloseTest();
+		}
+
+		private static void AutoCloseTest()
+		{
+			CodeDraw cd1 = new CodeDraw();
+			CodeDraw cd2 = new CodeDraw();
+
+			cd1.Dispose();
+			cd2.Dispose(false);
+
+			for (int i = 0; i < 10; i++)
+			{
+				Thread.Sleep(1000);
+				Console.WriteLine("sleeping");
+			}
 		}
 
 		private static void TriangleTest()

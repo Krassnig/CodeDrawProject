@@ -505,10 +505,15 @@ namespace CodeDrawNS
 		/// </summary>
 		public void Dispose()
 		{
+			Dispose(true);
+		}
+
+		public void Dispose(bool exit)
+		{
 			brush.Dispose();
 			pen.Dispose();
 			Font.Dispose();
-			form.CloseAndDispose();
+			form.CloseAndDispose(exit);
 		}
 
 		private static float transformStart(double startRadians)

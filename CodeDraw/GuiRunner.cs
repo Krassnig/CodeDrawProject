@@ -48,7 +48,7 @@ namespace CodeDrawNS
 			}
 			finally
 			{
-				DecrementCanvasCount();
+				DecrementCanvasCount(canvas == null ? true : canvas.ExitOnLastClose);
 			}
 		}
 
@@ -67,11 +67,11 @@ namespace CodeDrawNS
 			canvasCountRegion.Release();
 		}
 
-		private static void DecrementCanvasCount()
+		private static void DecrementCanvasCount(bool closeIfCountZero)
 		{
 			canvasCountRegion.WaitOne();
 			canvasCount--;
-			if (canvasCount == 0) Environment.Exit(0);
+			if (canvasCount == 0 && closeIfCountZero) Environment.Exit(0);
 			canvasCountRegion.Release();
 		}
 	}

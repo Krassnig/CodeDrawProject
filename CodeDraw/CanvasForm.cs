@@ -46,6 +46,8 @@ namespace CodeDrawNS
 			set => InvokeAsync(() => form.DesktopLocation = value);
 		}
 
+		public bool ExitOnLastClose { get; set; } = true;
+
 		public event MouseEventHandler MouseClick
 		{
 			add => form.MouseClick += value;
@@ -184,8 +186,9 @@ namespace CodeDrawNS
 			s.WaitOne();
 		}
 
-		public void CloseAndDispose()
+		public void CloseAndDispose(bool exitOnLastClose)
 		{
+			ExitOnLastClose = exitOnLastClose;
 			InvokeSync(() => form.Close());
 			Dispose();
 		}
