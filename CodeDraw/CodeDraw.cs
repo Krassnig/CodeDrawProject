@@ -501,13 +501,17 @@ namespace CodeDrawNS
 		}
 
 		/// <summary>
-		/// Closes the JFrame and disposes all created resources associated with this CodeDraw instance.
+		/// Closes the frame and disposes all created resources associated with this CodeDraw instance.
 		/// </summary>
 		public void Dispose()
 		{
 			Dispose(true);
 		}
 
+		/// <summary>
+		/// Closes the frame and disposes all created resources associated with this CodeDraw instance.
+		/// </summary>
+		/// <param name="exit">when true terminates the process when all CodeDraw instances are closed.</param>
 		public void Dispose(bool exit)
 		{
 			brush.Dispose();
