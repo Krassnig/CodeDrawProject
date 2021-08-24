@@ -44,8 +44,6 @@ namespace CodeDrawNS
 	/// </summary>
 	public class CodeDraw : IDisposable
 	{
-		//private static void Main(string[] args) { }
-
 		/// <summary>
 		/// Creates a canvas with size 600x600 pixel
 		/// </summary>
@@ -65,11 +63,14 @@ namespace CodeDrawNS
 			Height = canvasHeight;
 
 			form = CanvasForm.Create(new Size(Width, Height));
-			form.Title = "CodeDraw";
 			buffer = form.CreateBufferedGraphics();
-
 			UpdateBrushes();
-			Reset();
+
+			Title = "CodeDraw";
+			Color = Color.Black;
+			LineWidth = 1;
+
+			Clear();
 			Show();
 		}
 
@@ -114,12 +115,12 @@ namespace CodeDrawNS
 		}
 
 		private double linesize = 1;
-		public double LineSize
+		public double LineWidth
 		{
 			get => linesize;
 			set
 			{
-				if (value < 1) throw new ArgumentException($"{nameof(LineSize)} must be greater than 1.", nameof(LineSize));
+				if (value < 1) throw new ArgumentException($"{nameof(LineWidth)} must be greater than 1.", nameof(LineWidth));
 				linesize = value;
 				UpdateBrushes();
 			}
@@ -460,7 +461,7 @@ namespace CodeDrawNS
 		/// <summary>
 		/// Colors the whole canvas in white.
 		/// </summary>
-		public void Reset()
+		public void Clear()
 		{
 			Reset(Color.White);
 		}

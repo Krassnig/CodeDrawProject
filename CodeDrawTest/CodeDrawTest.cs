@@ -31,8 +31,8 @@ namespace CodeDrawTest
 			//TwoWindowTest();
 			//CornerTest();
 			//AnimationTest();
-			//ProofOfConcept();
-			AutoCloseTest();
+			ProofOfConcept();
+			//AutoCloseTest();
 		}
 
 		private static void AutoCloseTest()
@@ -71,7 +71,7 @@ namespace CodeDrawTest
 				cd.FramePositionX = pos;
 				cd.FramePositionY = pos;
 
-				cd.Reset();
+				cd.Clear();
 				cd.DrawSquare(500 - pos, 500 - pos, 100);
 				cd.Show(100);
 			}
@@ -80,7 +80,7 @@ namespace CodeDrawTest
 		private static void LineSizeTest()
 		{
 			CodeDraw cd = new CodeDraw();
-			cd.LineSize = 5;
+			cd.LineWidth = 5;
 
 			cd.DrawSquare(20, 20, 100);
 			cd.Show();
@@ -119,7 +119,7 @@ namespace CodeDrawTest
 
 			for (double i = 0; true; i += Math.PI / 64)
 			{
-				c.Reset();
+				c.Clear();
 
 				c.Color = Color.Black;
 				c.DrawCircle(300, 300, radius);
@@ -146,7 +146,7 @@ namespace CodeDrawTest
 
 			for (double i = 0; i < Math.PI / 2; i += steps)
 			{
-				c.Reset();
+				c.Clear();
 
 				c.FillArc(100, 100, 800, 800, Math.PI / 2, i);
 				c.DrawArc(100, 100, 850, 850, Math.PI / 2, i);
@@ -276,14 +276,14 @@ namespace CodeDrawTest
 			{
 				for (int i = 0; i < end; i++)
 				{
-					w.Reset();
+					w.Clear();
 					w.DrawText(offset + i * steps, offset, "I'm animated!");
 					w.Show(pause);
 				}
 
 				for (int i = 0; i < end; i++)
 				{
-					w.Reset();
+					w.Clear();
 					w.DrawText(offset + steps * end - i * steps, offset, "I'm animated!");
 					w.Show(pause);
 				}
@@ -322,7 +322,7 @@ namespace CodeDrawTest
 
 			for (int i = 0; i < 30; i++)
 			{
-				draw.Reset();
+				draw.Clear();
 
 				draw.Color = Color.Black;
 				draw.DrawPoint(99, 399);
@@ -347,7 +347,7 @@ namespace CodeDrawTest
 			l.FillCircle(50, 50, 50);
 
 			l.Color = Color.LightBlue;
-			l.LineSize = 5;
+			l.LineWidth = 5;
 			l.DrawRectangle(30, 30, 200, 200);
 
 			l.Show();

@@ -41,7 +41,7 @@ namespace CodeDrawTest
 				int dx = x - c.FramePositionX;
 				int dy = y - c.FramePositionY;
 
-				c.Reset();
+				c.Clear();
 				c.DrawSquare(dx, dy, 100);
 				c.Show();
 			};
@@ -56,7 +56,7 @@ namespace CodeDrawTest
 
 			mapTopEvent(cd, (c, a) =>
 			{
-				c.Reset();
+				c.Clear();
 				s += (char)a.KeyCode;
 				c.DrawText(300, 300, s);
 				c.Show();
@@ -75,7 +75,7 @@ namespace CodeDrawTest
 			{
 				l += a.Delta / 5;
 
-				c.Reset();
+				c.Clear();
 				c.DrawTriangle(200, 300, 400, 300, 300, 300 + l);
 				c.Show();
 			};
@@ -91,7 +91,7 @@ namespace CodeDrawTest
 
 			mapToEvent(cd, (CodeDraw w, EventArgs a) =>
 			{
-				w.Reset();
+				w.Clear();
 				w.DrawText(300, 300, count++.ToString());
 				w.Show();
 			});

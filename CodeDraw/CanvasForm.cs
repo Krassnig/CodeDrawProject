@@ -134,6 +134,7 @@ namespace CodeDrawNS
 		public void WaitForInvocability()
 		{
 			while (!form.IsHandleCreated) Thread.Sleep(10);
+			Thread.Sleep(10);
 			InvokeSync(() => { });
 		}
 
