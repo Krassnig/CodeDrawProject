@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CodeDrawProject;
+using System;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using CodeDrawProject;
 
 namespace CodeDrawTest
 {
@@ -21,7 +17,12 @@ namespace CodeDrawTest
 			//FramePositionTest();
 			//DisposeCloseTest();
 			//SmallWindowTest();
-			ImageSaveTest();
+			//ImageSaveTest();
+			//ImageScaleTest();
+			//ImageTest();
+			//TwoWindowTest();
+			//CornerTest();
+			//ProofOfConcept();
 		}
 
 		private static void AutoCloseTest()
@@ -107,6 +108,69 @@ namespace CodeDrawTest
 		private static string? GetExecutingFolder()
 		{
 			return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+		}
+
+		private static void ImageScaleTest()
+		{
+			CodeDraw w = new CodeDraw();
+
+			w.DrawImage(100, 100, 200, 200, Properties.Resources.CuteChick);
+
+			w.Show();
+		}
+
+		private static void ImageTest()
+		{
+			CodeDraw w = new CodeDraw(820, 620);
+
+			w.DrawImage(10, 10, Properties.Resources.CuteChick);
+
+			w.Show();
+		}
+
+		private static void TwoWindowTest()
+		{
+			CodeDraw cd1 = new CodeDraw();
+			CodeDraw cd2 = new CodeDraw();
+
+			cd1.DrawCircle(100, 100, 50);
+			cd2.DrawCircle(400, 200, 100);
+
+			cd1.Show();
+			cd2.Show();
+		}
+
+		private static void CornerTest()
+		{
+			CodeDraw cd = new CodeDraw();
+
+			int size = 1;
+
+			cd.Color = Color.Red;
+			cd.FillRectangle(0, 0, size, size);
+			cd.FillRectangle(0, cd.Height - size, size, size);
+			cd.FillRectangle(cd.Width - size, 0, size, size);
+			cd.FillRectangle(cd.Width - size, cd.Height - size, size, size);
+			cd.Show();
+		}
+
+		private static void ProofOfConcept()
+		{
+			CodeDraw cd = new CodeDraw();
+
+			cd.Color = Color.Red;
+			cd.FillRectangle(20, 20, 100, 100);
+
+			cd.Title = "Hello World";
+
+			cd.Color = Color.Blue;
+			cd.FillCircle(50, 50, 50);
+
+			cd.Color = Color.LightBlue;
+			cd.LineWidth = 5;
+			cd.DrawRectangle(30, 30, 200, 200);
+
+			cd.Show();
 		}
 	}
 }

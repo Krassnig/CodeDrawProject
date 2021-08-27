@@ -86,8 +86,8 @@ namespace CodeDrawProject
 
 		public bool IsAntialiased
 		{
-			get => G.SmoothingMode == SmoothingMode.HighQuality;
-			set => G.SmoothingMode = value ? SmoothingMode.HighQuality : SmoothingMode.HighSpeed;
+			get => G.SmoothingMode == SmoothingMode.AntiAlias;
+			set => G.SmoothingMode = value ? SmoothingMode.AntiAlias : SmoothingMode.HighSpeed;
 		}
 
 		private SolidBrush brush = new SolidBrush(Color.Black);
