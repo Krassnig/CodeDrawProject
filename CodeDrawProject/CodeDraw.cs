@@ -24,9 +24,18 @@ namespace CodeDrawProject
 			Title = "CodeDraw";
 			Color = Color.Black;
 			LineWidth = 1;
+			IsAntialiased = true;
 
 			Clear();
 			Show();
+
+			KeyDown += (cd, args) =>
+			{
+				if (args.Control && args.KeyCode == Keys.C)
+				{
+					form.CopyToClipboard();
+				}
+			};
 		}
 
 		private CanvasForm form;
@@ -73,6 +82,12 @@ namespace CodeDrawProject
 				lineWidth = value;
 				UpdateBrushes();
 			}
+		}
+
+		public bool IsAntialiased
+		{
+			get => G.SmoothingMode == SmoothingMode.HighQuality;
+			set => G.SmoothingMode = value ? SmoothingMode.HighQuality : SmoothingMode.HighSpeed;
 		}
 
 		private SolidBrush brush = new SolidBrush(Color.Black);
@@ -156,109 +171,137 @@ namespace CodeDrawProject
 			return (sender, args) => keyEvent(this, args);
 		}
 
-		public void DrawPoint(int x, int y)
+		public void DrawPoint(double x, double y)
 		{
-			FillSquare(x, y, 1);
+			FillCircle(x, y, lineWidth);
 		}
 
-		public void DrawLine(int startx, int starty, int endx, int endy)
+		public void DrawLine(double startx, double starty, double endx, double endy)
 		{
-			G.DrawLine(pen, startx, starty, endx, endy);
+			G.DrawLine(pen, (float)startx, (float)starty, (float)endx, (float)endy);
 		}
 
-		public void DrawBezier((int, int) start, (int, int) control1, (int, int) control2, (int, int) end)
+		public void DrawBezier((double, double) start, (double, double) control1, (double, double) control2, (double, double) end)
 		{
 			G.DrawBezier(pen, MapToPoint(start), MapToPoint(control1), MapToPoint(control2), MapToPoint(end));
 		}
 
-		public void DrawSquare(int x, int y, int sideLength)
+		public void DrawSquare(double x, double y, double sideLength)
 		{
 			DrawRectangle(x, y, sideLength, sideLength);
 		}
 
-		public void FillSquare(int x, int y, int sideLength)
+		public void FillSquare(double x, double y, double sideLength)
 		{
 			FillRectangle(x, y, sideLength, sideLength);
 		}
 
-		public void DrawRectangle(int x, int y, int width, int height)
+		public void DrawRectangle(double x, double y, double width, double height)
 		{
-			G.DrawRectangle(pen, x, y, width, height);
+			G.DrawRectangle(pen, (float)x, (float)y, (float)width, (float)height);
 		}
 
-		public void FillRectangle(int x, int y, int width, int height)
+		public void FillRectangle(double x, double y, double width, double height)
 		{
-			G.FillRectangle(brush, x, y, width, height);
+			G.FillRectangle(brush, (float)x, (float)y, (float)width, (float)height);
 		}
 
-		public void DrawCircle(int x, int y, int radius)
+		public void DrawCircle(double x, double y, double radius)
 		{
 			DrawEllipse(x, y, radius, radius);
 		}
 
-		public void FillCircle(int x, int y, int radius)
+		public void FillCircle(double x, double y, double radius)
 		{
 			FillEllipse(x, y, radius, radius);
 		}
 
-		public void DrawEllipse(int x, int y, int horizontalRadius, int verticalRadius)
+		public void DrawEllipse(double x, double y, double horizontalRadius, double verticalRadius)
 		{
-			G.DrawEllipse(pen, x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius);
+			G.DrawEllipse(
+				pen,
+				(float)(x - horizontalRadius),
+				(float)(y - verticalRadius),
+				(float)(2 * horizontalRadius),
+				(float)(2 * verticalRadius)
+			);
 		}
 
-		public void FillEllipse(int x, int y, int horizontalRadius, int verticalRadius)
+		public void FillEllipse(double x, double y, double horizontalRadius, double verticalRadius)
 		{
-			G.FillEllipse(brush, x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius);
+			G.FillEllipse(
+				brush,
+				(float)(x - horizontalRadius),
+				(float)(y - verticalRadius),
+				(float)(2 * horizontalRadius),
+				(float)(2 * verticalRadius)
+			);
 		}
 
-		public void DrawArc(int x, int y, int horizontalRadius, int verticalRadius, double startRadians, double sweepRadians)
+		public void DrawArc(double x, double y, double horizontalRadius, double verticalRadius, double startRadians, double sweepRadians)
 		{
-			G.DrawArc(pen, new Rectangle(x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius), transformStart(startRadians), transformSweep(sweepRadians));
+			G.DrawArc(
+				pen,
+				(float)(x - horizontalRadius),
+				(float)(y - verticalRadius),
+				(float)(2 * horizontalRadius),
+				(float)(2 * verticalRadius),
+				transformStart(startRadians),
+				transformSweep(sweepRadians)
+			);
 		}
 
-		public void FillArc(int x, int y, int horizontalRadius, int verticalRadius, double startRadians, double sweepRadians)
+		public void FillArc(double x, double y, double horizontalRadius, double verticalRadius, double startRadians, double sweepRadians)
 		{
-			G.FillPie(brush, new Rectangle(x - horizontalRadius, y - verticalRadius, 2 * horizontalRadius, 2 * verticalRadius), transformStart(startRadians), transformSweep(sweepRadians));
+			G.FillPie(
+				brush,
+				(float)(x - horizontalRadius),
+				(float)(y - verticalRadius),
+				(float)(2 * horizontalRadius),
+				(float)(2 * verticalRadius),
+				transformStart(startRadians),
+				transformSweep(sweepRadians)
+			);
 		}
 
-		public void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+		public void DrawTriangle(double x1, double y1, double x2, double y2, double x3, double y3)
 		{
 			DrawPolygon((x1, y1), (x2, y2), (x3, y3));
 		}
 
-		public void FillTriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+		public void FillTriangle(double x1, double y1, double x2, double y2, double x3, double y3)
 		{
 			FillPolygon((x1, y1), (x2, y2), (x3, y3));
 		}
 
-		public void DrawPolygon(params (int, int)[] points)
+		public void DrawPolygon(params (double, double)[] points)
 		{
 			if (points.Length < 2) throw new ArgumentException("There have to be at least two points to draw a polygon.");
 
 			G.DrawPolygon(pen, MapToPoints(points));
 		}
 
-		public void FillPolygon(params (int, int)[] points)
+		public void FillPolygon(params (double, double)[] points)
 		{
 			if (points.Length < 2) throw new ArgumentException("There have to be at least two points to draw a polygon.");
 
 			G.FillPolygon(brush, MapToPoints(points));
 		}
 
-		public void DrawImage(int x, int y, Image image)
+		public void DrawImage(double x, double y, Image image)
 		{
 			if (image == null) throw CreateArgumentNull(nameof(image));
 
-			G.DrawImage(image, x, y);
+			G.DrawImage(image, (float)x, (float)y);
 		}
 
-		public void DrawImage(int x, int y, int width, int height, Image image)
+		public void DrawImage(double x, double y, double width, double height, Image image)
 		{
 			if (width < 0) throw CreateArgumentNotNegative(nameof(width));
 			if (height < 0) throw CreateArgumentNotNegative(nameof(height));
 			if (image == null) throw CreateArgumentNull(nameof(image));
 
-			G.DrawImage(image, x, y, width, height);
+			G.DrawImage(image, (float)x, (float)y, (float)width, (float)height);
 		}
 
 		public Image AsImage()
@@ -282,8 +325,13 @@ namespace CodeDrawProject
 		public void Clear(Color color)
 		{
 			Color c = Color;
+			bool aa = IsAntialiased;
+
+			IsAntialiased = false;
 			Color = color;
 			FillRectangle(0, 0, Width, Height);
+
+			IsAntialiased = aa;
 			Color = c;
 		}
 
@@ -325,9 +373,9 @@ namespace CodeDrawProject
 			return Radians * (180 / Math.PI);
 		}
 
-		private static Point[] MapToPoints((int, int)[] tuples)
+		private static PointF[] MapToPoints((double, double)[] tuples)
 		{
-			Point[] result = new Point[tuples.Length];
+			PointF[] result = new PointF[tuples.Length];
 
 			for (int i = 0; i < result.Length; i++)
 			{
@@ -337,9 +385,9 @@ namespace CodeDrawProject
 			return result;
 		}
 
-		private static Point MapToPoint((int, int) tuple)
+		private static PointF MapToPoint((double, double) tuple)
 		{
-			return new Point(tuple.Item1, tuple.Item2);
+			return new PointF((float)tuple.Item1, (float)tuple.Item2);
 		}
 
 		private static NullReferenceException CreateArgumentNull(string argumentName)
