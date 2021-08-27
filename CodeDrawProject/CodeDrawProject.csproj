@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-	<UseWindowsForms>true</UseWindowsForms>
-	<nullable>enable</nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <nullable>enable</nullable>
   </PropertyGroup>
 
   <ItemGroup>

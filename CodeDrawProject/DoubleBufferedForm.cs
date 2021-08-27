@@ -1,8 +1,8 @@
 ﻿using System.Windows.Forms;
 
-namespace CodeDrawNS
+namespace CodeDrawProject
 {
-	internal class DoubleBufferedForm : Form
+	class DoubleBufferedForm : Form
 	{
 		public DoubleBufferedForm()
 		{

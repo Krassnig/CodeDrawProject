@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace CodeDrawNS
+namespace CodeDrawProject
 {
 	internal class CanvasForm : IDisposable
 	{
@@ -17,11 +17,9 @@ namespace CodeDrawNS
 			form.AutoScaleDimensions = new SizeF(7F, 15F);
 			form.AutoScaleMode = AutoScaleMode.Font;
 			form.ClientSize = size;
-			form.Name = "LiteDrawForm";
 			form.Icon = Properties.Resources.CodeDrawIcon;
 			form.MaximizeBox = false;
 			form.FormBorderStyle = FormBorderStyle.FixedSingle;
-			form.KeyDown += OnCtrlCPasteDisplayImageToClipboard;
 
 			form.ResumeLayout(false);
 
@@ -34,19 +32,19 @@ namespace CodeDrawNS
 		private BufferedGraphicsContext context = new BufferedGraphicsContext();
 		private KeyDownDictionary keyDown = new KeyDownDictionary();
 
+		public bool ExitOnLastClose { get; set; } = true;
+
 		public string Title
 		{
 			get => form.Text;
 			set => InvokeAsync(() => form.Text = value);
 		}
 
-		public Point DesktopLocation
+		public Point FramePosition
 		{
 			get => form.DesktopLocation;
 			set => InvokeAsync(() => form.DesktopLocation = value);
 		}
-
-		public bool ExitOnLastClose { get; set; } = true;
 
 		public event MouseEventHandler MouseClick
 		{
@@ -100,7 +98,7 @@ namespace CodeDrawNS
 			remove => form.KeyUp -= value;
 		}
 
-		public event EventHandler WindowMove
+		public event EventHandler FrameMove
 		{
 			add => form.Move += value;
 			remove => form.Move -= value;
@@ -121,14 +119,14 @@ namespace CodeDrawNS
 		{
 			CopyToCanvas(buffer);
 
-			using Semaphore s = new Semaphore(0, 100);
+			using SemaphoreSlim s = new SemaphoreSlim(0);
 			InvokeAsync(() =>
 			{
 				CopyToForm(buffer);
 				s.Release();
 			});
 			Thread.Sleep(waitMilliseconds);
-			s.WaitOne();
+			s.Wait();
 		}
 
 		public void WaitForInvocability()
@@ -138,12 +136,9 @@ namespace CodeDrawNS
 			InvokeSync(() => { });
 		}
 
-		private void OnCtrlCPasteDisplayImageToClipboard(object? sender, KeyEventArgs args)
+		public void CopyToClipboard()
 		{
-			if (args.Control && args.KeyCode == Keys.C)
-			{
-				Clipboard.SetImage(canvas);
-			}
+			Clipboard.SetImage(canvas);
 		}
 
 		private void CopyToCanvas(BufferedGraphics buffer)
@@ -176,7 +171,7 @@ namespace CodeDrawNS
 
 		private void InvokeSync(Action action)
 		{
-			using Semaphore s = new Semaphore(0, 100);
+			using SemaphoreSlim s = new SemaphoreSlim(0);
 
 			InvokeAsync(() =>
 			{
@@ -184,7 +179,7 @@ namespace CodeDrawNS
 				s.Release();
 			});
 
-			s.WaitOne();
+			s.Wait();
 		}
 
 		public void CloseAndDispose(bool exitOnLastClose)

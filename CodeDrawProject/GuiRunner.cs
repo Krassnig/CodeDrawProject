@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Threading;
 
-namespace CodeDrawNS
+namespace CodeDrawProject
 {
 	internal class GuiRunner : IDisposable
 	{
@@ -22,7 +22,7 @@ namespace CodeDrawNS
 		{
 			thread.SetApartmentState(ApartmentState.STA);
 			thread.Start();
-			canvasIsSet.WaitOne();
+			canvasIsSet.Wait();
 			if (canvas == null) throw new Exception("LiteDraw is in an invalid state, although gui has been instanciated the gui is still null.");
 			canvas.WaitForInvocability();
 			return canvas;
@@ -30,7 +30,7 @@ namespace CodeDrawNS
 
 		private Size size;
 		private CanvasForm? canvas;
-		private Semaphore canvasIsSet = new Semaphore(0, 100);
+		private SemaphoreSlim canvasIsSet = new SemaphoreSlim(0);
 		private Thread thread;
 
 		[STAThread]
@@ -57,19 +57,19 @@ namespace CodeDrawNS
 			canvasIsSet.Dispose();
 		}
 
-		private static Semaphore canvasCountRegion = new Semaphore(1, int.MaxValue);
+		private static SemaphoreSlim canvasCountRegion = new SemaphoreSlim(1);
 		private static int canvasCount = 0;
 
 		private static void IncrementCanvasCount()
 		{
-			canvasCountRegion.WaitOne();
+			canvasCountRegion.Wait();
 			canvasCount++;
 			canvasCountRegion.Release();
 		}
 
 		private static void DecrementCanvasCount(bool closeIfCountZero)
 		{
-			canvasCountRegion.WaitOne();
+			canvasCountRegion.Wait();
 			canvasCount--;
 			if (canvasCount == 0 && closeIfCountZero) Environment.Exit(0);
 			canvasCountRegion.Release();

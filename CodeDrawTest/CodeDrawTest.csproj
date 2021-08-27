@@ -1,14 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
 	<TargetFramework>net5.0-windows</TargetFramework>
-	<OutputType>WinExe</OutputType>
+    <AutoGenerateBindingRedirects></AutoGenerateBindingRedirects>
 	<UseWindowsForms>true</UseWindowsForms>
+    <StartupObject>CodeDrawTest.Program</StartupObject>
 	<nullable>enable</nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CodeDraw\CodeDraw.csproj" />
+    <ProjectReference Include="..\CodeDrawProject\CodeDrawProject.csproj" />
   </ItemGroup>
 
 </Project>
