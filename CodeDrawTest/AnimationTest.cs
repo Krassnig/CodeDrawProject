@@ -1,10 +1,6 @@
 ﻿using CodeDrawProject;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CodeDrawTest
 {
@@ -12,10 +8,14 @@ namespace CodeDrawTest
 	{
 		public static void Main(string[] args)
 		{
+			// Always commit all function commmented out!
+
 			//ClockTest();
 			//SinCosTest();
 			//GranularAngleTest();
-			ArcOriginTest();
+			//ArcOriginTest();
+			//TextAnimationTest();
+			//AnimationTest2();
 		}
 
 		private static void ClockTest()
@@ -99,6 +99,51 @@ namespace CodeDrawTest
 			cd.FillArc(300, 300, 50, 50, -Math.Tau / 8, Math.Tau / 8);
 
 			cd.Show();
+		}
+
+		private static void TextAnimationTest()
+		{
+			CodeDraw cd = new CodeDraw();
+
+			int steps = 5;
+			int end = 80;
+			int offset = 100;
+			int pause = 10;
+
+			while (true)
+			{
+				for (int i = 0; i < end; i++)
+				{
+					cd.Clear();
+					cd.DrawText(offset + i * steps, offset, "I'm animated!");
+					cd.Show(pause);
+				}
+
+				for (int i = 0; i < end; i++)
+				{
+					cd.Clear();
+					cd.DrawText(offset + steps * end - i * steps, offset, "I'm animated!");
+					cd.Show(pause);
+				}
+			}
+		}
+
+		private static void AnimationTest2()
+		{
+			CodeDraw cd = new CodeDraw();
+
+			for (int i = 0; i < 30; i++)
+			{
+				cd.Clear();
+
+				cd.Color = Color.Black;
+				cd.DrawPoint(99, 399);
+				cd.DrawText(100, 400, "Hello World!");
+				cd.FillRectangle(100 + i * 10, 100 + i, 100, 100);
+				cd.Color = Color.Orange;
+				cd.FillEllipse(20, 40, 20, 40);
+				cd.Show(30);
+			}
 		}
 	}
 }

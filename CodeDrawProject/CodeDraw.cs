@@ -170,6 +170,18 @@ namespace CodeDrawProject
 		{
 			return (sender, args) => keyEvent(this, args);
 		}
+		
+		public void DrawText(double x, double y, string text)
+		{
+			if (text == null) throw CreateArgumentNull(nameof(text));
+
+			G.DrawString(text, Font, brush, (float)x, (float)y);
+		}
+
+		public void DrawPixel(double x, double y)
+		{
+			FillSquare(x, y, 1);
+		}
 
 		public void DrawPoint(double x, double y)
 		{
