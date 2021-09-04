@@ -20,6 +20,7 @@ namespace CodeDrawProject
 			form = CanvasForm.Create(new Size(Width, Height));
 			buffer = form.CreateBufferedGraphics();
 			UpdateBrushes();
+			BindEvents();
 
 			Title = "CodeDraw";
 			Color = Color.Black;
@@ -100,77 +101,103 @@ namespace CodeDrawProject
 			pen = new Pen(color, (float)lineWidth);
 		}
 
+		private void BindEvents()
+		{
+			mouseClickEvent = new Event<MouseEventArgs>(this);
+			form.MouseClick += mouseClickEvent.Invoke;
+			mouseMoveEvent = new Event<MouseEventArgs>(this);
+			form.MouseMove += mouseMoveEvent.Invoke;
+			mouseDownEvent = new Event<MouseEventArgs>(this);
+			form.MouseDown += mouseDownEvent.Invoke;
+			mouseUpEvent = new Event<MouseEventArgs>(this);
+			form.MouseUp += mouseUpEvent.Invoke;
+			mouseEnterEvent = new Event<EventArgs>(this);
+			form.MouseEnter += mouseEnterEvent.Invoke;
+			mouseLeaveEvent = new Event<EventArgs>(this);
+			form.MouseLeave += mouseLeaveEvent.Invoke;
+			mouseWheelEvent = new Event<MouseEventArgs>(this);
+			form.MouseWheel += mouseWheelEvent.Invoke;
+
+			keyPressEvent = new Event<KeyEventArgs>(this);
+			form.KeyPress += keyPressEvent.Invoke;
+			keyUpEvent = new Event<KeyEventArgs>(this);
+			form.KeyUp += keyUpEvent.Invoke;
+			keyDownEvent = new Event<KeyEventArgs>(this);
+			form.KeyDown += keyDownEvent.Invoke;
+
+			frameMoveEvent = new Event<EventArgs>(this);
+			form.FrameMove += frameMoveEvent.Invoke;
+		}
+
+		private Event<MouseEventArgs> mouseClickEvent;
 		public event EventHandler<MouseEventArgs> MouseClick
 		{
-			add => form.MouseClick += MapEvent(value);
-			remove => form.MouseClick -= MapEvent(value);
+			add => mouseClickEvent += value;
+			remove => mouseClickEvent -= value;
 		}
+		private Event<MouseEventArgs> mouseMoveEvent;
 		public event EventHandler<MouseEventArgs> MouseMove
 		{
-			add => form.MouseMove += MapEvent(value);
-			remove => form.MouseMove -= MapEvent(value);
+			add => mouseMoveEvent += value;
+			remove => mouseMoveEvent -= value;
 		}
+		private Event<MouseEventArgs> mouseDownEvent;
 		public event EventHandler<MouseEventArgs> MouseDown
 		{
-			add => form.MouseDown += MapEvent(value);
-			remove => form.MouseDown -= MapEvent(value);
+			add => mouseDownEvent += value;
+			remove => mouseDownEvent -= value;
 		}
+		private Event<MouseEventArgs> mouseUpEvent;
 		public event EventHandler<MouseEventArgs> MouseUp
 		{
-			add => form.MouseUp += MapEvent(value);
-			remove => form.MouseUp -= MapEvent(value);
+			add => mouseUpEvent += value;
+			remove => mouseUpEvent -= value;
 		}
+		private Event<EventArgs> mouseEnterEvent;
 		public event EventHandler<EventArgs> MouseEnter
 		{
-			add => form.MouseEnter += MapEvent(value);
-			remove => form.MouseEnter -= MapEvent(value);
+			add => mouseEnterEvent += value;
+			remove => mouseEnterEvent -= value;
 		}
+		private Event<EventArgs> mouseLeaveEvent;
 		public event EventHandler<EventArgs> MouseLeave
 		{
-			add => form.MouseLeave += MapEvent(value);
-			remove => form.MouseLeave -= MapEvent(value);
+			add => mouseLeaveEvent += value;
+			remove => mouseLeaveEvent -= value;
 		}
+		private Event<MouseEventArgs> mouseWheelEvent;
 		public event EventHandler<MouseEventArgs> MouseWheel
 		{
-			add => form.MouseWheel += MapEvent(value);
-			remove => form.MouseWheel -= MapEvent(value);
+			add => mouseWheelEvent += value;
+			remove => mouseWheelEvent -= value;
 		}
 
+		private Event<KeyEventArgs> keyPressEvent;
 		public event EventHandler<KeyEventArgs> KeyPress
 		{
-			add => form.KeyPress += MapEvent(value);
-			remove => form.KeyPress -= MapEvent(value);
+			add => keyPressEvent += value;
+			remove => keyPressEvent -= value;
 		}
+		private Event<KeyEventArgs> keyUpEvent;
 		public event EventHandler<KeyEventArgs> KeyUp
 		{
-			add => form.KeyUp += MapEvent(value);
-			remove => form.KeyUp -= MapEvent(value);
+			add => keyUpEvent += value;
+			remove => keyUpEvent -= value;
 		}
+		private Event<KeyEventArgs> keyDownEvent;
 		public event EventHandler<KeyEventArgs> KeyDown
 		{
-			add => form.KeyDown += MapEvent(value);
-			remove => form.KeyDown += MapEvent(value);
+			add => keyDownEvent += value;
+			remove => keyDownEvent -= value;
 		}
 
+		private Event<EventArgs> frameMoveEvent;
 		public event EventHandler<EventArgs> FrameMove
 		{
-			add => form.FrameMove += MapEvent(value);
-			remove => form.FrameMove -= MapEvent(value);
+			add => frameMoveEvent += value;
+			remove => frameMoveEvent -= value;
 		}
 
-		private EventHandler MapEvent(EventHandler<EventArgs> anyEvent)
-		{
-			return (sender, args) => anyEvent(this, args);
-		}
-		private MouseEventHandler MapEvent(EventHandler<MouseEventArgs> mouseEvent)
-		{
-			return (sender, args) => mouseEvent(this, args);
-		}
-		private KeyEventHandler MapEvent(EventHandler<KeyEventArgs> keyEvent)
-		{
-			return (sender, args) => keyEvent(this, args);
-		}
-		
 		public void DrawText(double x, double y, string text)
 		{
 			if (text == null) throw CreateArgumentNull(nameof(text));
