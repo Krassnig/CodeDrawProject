@@ -9,7 +9,7 @@ namespace CodeDrawProject
 
 		private Dictionary<Keys, bool> keyPress = new Dictionary<Keys, bool>();
 
-		public void KeyPressEventHandler(object? sender, KeyEventArgs args)
+		public void KeyDownEventHandler(object? sender, KeyEventArgs args)
 		{
 			if (!keyPress.GetValueOrDefault(args.KeyData, false))
 			{

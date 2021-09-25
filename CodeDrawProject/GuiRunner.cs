@@ -6,15 +6,16 @@ namespace CodeDrawProject
 {
 	internal class GuiRunner : IDisposable
 	{
-		public static CanvasForm CreateGui(Size size)
+		public static CanvasForm CreateGui(Size size, EventInvokeCollection events)
 		{
-			using GuiRunner runner = new GuiRunner(size);
+			using GuiRunner runner = new GuiRunner(size, events);
 			return runner.Start();
 		}
 
-		private GuiRunner(Size size)
+		private GuiRunner(Size size, EventInvokeCollection events)
 		{
 			this.size = size;
+			this.events = events;
 			thread = new Thread(Run);
 		}
 
@@ -29,6 +30,7 @@ namespace CodeDrawProject
 		}
 
 		private Size size;
+		private EventInvokeCollection events;
 		private CanvasForm? canvas;
 		private SemaphoreSlim canvasIsSet = new SemaphoreSlim(0);
 		private Thread thread;
@@ -41,7 +43,7 @@ namespace CodeDrawProject
 			try
 			{
 				IncrementCanvasCount();
-				canvas = new CanvasForm(size);
+				canvas = new CanvasForm(size, events);
 				canvasIsSet.Release();
 
 				CanvasForm.Run(canvas);

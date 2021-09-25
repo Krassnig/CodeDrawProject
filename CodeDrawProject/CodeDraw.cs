@@ -17,10 +17,11 @@ namespace CodeDrawProject
 			Width = canvasWidth;
 			Height = canvasHeight;
 
-			form = CanvasForm.Create(new Size(Width, Height));
+			EventInvokeCollection events = CreateEventInvokeCollection();
+
+			form = CanvasForm.Create(new Size(Width, Height), events);
 			buffer = form.CreateBufferedGraphics();
 			UpdateBrushes();
-			BindEvents();
 
 			Title = "CodeDraw";
 			Color = Color.Black;
@@ -51,7 +52,6 @@ namespace CodeDrawProject
 			get => form.FramePosition.X;
 			set => form.FramePosition = new Point(value, form.FramePosition.Y);
 		}
-
 		public int FramePositionY
 		{
 			get => form.FramePosition.Y;
@@ -101,101 +101,46 @@ namespace CodeDrawProject
 			pen = new Pen(color, (float)lineWidth);
 		}
 
-		private void BindEvents()
-		{
-			mouseClickEvent = new Event<MouseEventArgs>(this);
-			form.MouseClick += mouseClickEvent.Invoke;
-			mouseMoveEvent = new Event<MouseEventArgs>(this);
-			form.MouseMove += mouseMoveEvent.Invoke;
-			mouseDownEvent = new Event<MouseEventArgs>(this);
-			form.MouseDown += mouseDownEvent.Invoke;
-			mouseUpEvent = new Event<MouseEventArgs>(this);
-			form.MouseUp += mouseUpEvent.Invoke;
-			mouseEnterEvent = new Event<EventArgs>(this);
-			form.MouseEnter += mouseEnterEvent.Invoke;
-			mouseLeaveEvent = new Event<EventArgs>(this);
-			form.MouseLeave += mouseLeaveEvent.Invoke;
-			mouseWheelEvent = new Event<MouseEventArgs>(this);
-			form.MouseWheel += mouseWheelEvent.Invoke;
+		public event EventHandler<MouseEventArgs>? MouseClick;
+		public event EventHandler<MouseEventArgs>? MouseMove;
+		public event EventHandler<MouseEventArgs>? MouseDown;
+		public event EventHandler<MouseEventArgs>? MouseUp;
+		public event EventHandler<EventArgs>? MouseEnter;
+		public event EventHandler<EventArgs>? MouseLeave;
+		public event EventHandler<MouseEventArgs>? MouseWheel;
+		public event EventHandler<KeyPressEventArgs>? KeyPress;
+		public event EventHandler<KeyEventArgs>? KeyUp;
+		public event EventHandler<KeyEventArgs>? KeyDown;
+		public event EventHandler<EventArgs>? WindowMove;
 
-			keyPressEvent = new Event<KeyEventArgs>(this);
-			form.KeyPress += keyPressEvent.Invoke;
-			keyUpEvent = new Event<KeyEventArgs>(this);
-			form.KeyUp += keyUpEvent.Invoke;
-			keyDownEvent = new Event<KeyEventArgs>(this);
-			form.KeyDown += keyDownEvent.Invoke;
+		protected virtual void OnMouseClick(MouseEventArgs args) => MouseClick?.Invoke(this, args);
+		protected virtual void OnMouseMove(MouseEventArgs args) => MouseMove?.Invoke(this, args);
+		protected virtual void OnMouseDown(MouseEventArgs args) => MouseDown?.Invoke(this, args);
+		protected virtual void OnMouseUp(MouseEventArgs args) => MouseUp?.Invoke(this, args);
+		protected virtual void OnMouseEnter(EventArgs args) => MouseEnter?.Invoke(this, args);
+		protected virtual void OnMouseLeave(EventArgs args) => MouseLeave?.Invoke(this, args);
+		protected virtual void OnMouseWheel(MouseEventArgs args) => MouseWheel?.Invoke(this, args);
+		protected virtual void OnKeyPress(KeyPressEventArgs args) => KeyPress?.Invoke(this, args);
+		protected virtual void OnKeyUp(KeyEventArgs args) => KeyUp?.Invoke(this, args);
+		protected virtual void OnKeyDown(KeyEventArgs args) => KeyDown?.Invoke(this, args);
+		protected virtual void OnWindowMove(EventArgs args) => WindowMove?.Invoke(this, args);
 
-			frameMoveEvent = new Event<EventArgs>(this);
-			form.FrameMove += frameMoveEvent.Invoke;
-		}
-
-		private Event<MouseEventArgs> mouseClickEvent;
-		public event EventHandler<MouseEventArgs> MouseClick
+		private EventInvokeCollection CreateEventInvokeCollection()
 		{
-			add => mouseClickEvent += value;
-			remove => mouseClickEvent -= value;
-		}
-		private Event<MouseEventArgs> mouseMoveEvent;
-		public event EventHandler<MouseEventArgs> MouseMove
-		{
-			add => mouseMoveEvent += value;
-			remove => mouseMoveEvent -= value;
-		}
-		private Event<MouseEventArgs> mouseDownEvent;
-		public event EventHandler<MouseEventArgs> MouseDown
-		{
-			add => mouseDownEvent += value;
-			remove => mouseDownEvent -= value;
-		}
-		private Event<MouseEventArgs> mouseUpEvent;
-		public event EventHandler<MouseEventArgs> MouseUp
-		{
-			add => mouseUpEvent += value;
-			remove => mouseUpEvent -= value;
-		}
-		private Event<EventArgs> mouseEnterEvent;
-		public event EventHandler<EventArgs> MouseEnter
-		{
-			add => mouseEnterEvent += value;
-			remove => mouseEnterEvent -= value;
-		}
-		private Event<EventArgs> mouseLeaveEvent;
-		public event EventHandler<EventArgs> MouseLeave
-		{
-			add => mouseLeaveEvent += value;
-			remove => mouseLeaveEvent -= value;
-		}
-		private Event<MouseEventArgs> mouseWheelEvent;
-		public event EventHandler<MouseEventArgs> MouseWheel
-		{
-			add => mouseWheelEvent += value;
-			remove => mouseWheelEvent -= value;
-		}
-
-		private Event<KeyEventArgs> keyPressEvent;
-		public event EventHandler<KeyEventArgs> KeyPress
-		{
-			add => keyPressEvent += value;
-			remove => keyPressEvent -= value;
-		}
-		private Event<KeyEventArgs> keyUpEvent;
-		public event EventHandler<KeyEventArgs> KeyUp
-		{
-			add => keyUpEvent += value;
-			remove => keyUpEvent -= value;
-		}
-		private Event<KeyEventArgs> keyDownEvent;
-		public event EventHandler<KeyEventArgs> KeyDown
-		{
-			add => keyDownEvent += value;
-			remove => keyDownEvent -= value;
-		}
-
-		private Event<EventArgs> frameMoveEvent;
-		public event EventHandler<EventArgs> FrameMove
-		{
-			add => frameMoveEvent += value;
-			remove => frameMoveEvent -= value;
+			return new EventInvokeCollection()
+			{
+				MouseClick = OnMouseClick,
+				MouseMove = OnMouseMove,
+				MouseDown = OnMouseDown,
+				MouseUp = OnMouseUp,
+				MouseEnter = OnMouseEnter,
+				MouseLeave = OnMouseLeave,
+				MouseWheel = OnMouseWheel,
+				KeyPress = OnKeyPress,
+				KeyUp = OnKeyUp,
+				KeyDown = OnKeyDown,
+				WindowMove = OnWindowMove
+			};
 		}
 
 		public void DrawText(double x, double y, string text)

@@ -7,10 +7,11 @@ namespace CodeDrawProject
 {
 	internal class CanvasForm : IDisposable
 	{
-		public CanvasForm(Size size)
+		public CanvasForm(Size size, EventInvokeCollection events)
 		{
-			this.canvas = new Bitmap(size.Width, size.Height);
-			this.form = new DoubleBufferedForm();
+			canvas = new Bitmap(size.Width, size.Height);
+			form = new DoubleBufferedForm();
+			events.SubscribeEvents(form);
 
 			form.SuspendLayout();
 
@@ -22,15 +23,11 @@ namespace CodeDrawProject
 			form.FormBorderStyle = FormBorderStyle.FixedSingle;
 
 			form.ResumeLayout(false);
-
-			form.KeyDown += keyDown.KeyPressEventHandler;
-			form.KeyUp += keyDown.KeyUpEventHandler;
 		}
 
 		private Form form;
 		private Bitmap canvas;
 		private BufferedGraphicsContext context = new BufferedGraphicsContext();
-		private KeyDownDictionary keyDown = new KeyDownDictionary();
 
 		public bool ExitOnLastClose { get; set; } = true;
 
@@ -44,64 +41,6 @@ namespace CodeDrawProject
 		{
 			get => form.DesktopLocation;
 			set => InvokeAsync(() => form.DesktopLocation = value);
-		}
-
-		public event MouseEventHandler MouseClick
-		{
-			add => form.MouseClick += value;
-			remove => form.MouseClick -= value;
-		}
-		public event MouseEventHandler MouseMove
-		{
-			add => form.MouseMove += value;
-			remove => form.MouseMove -= value;
-		}
-		public event MouseEventHandler MouseDown
-		{
-			add => form.MouseDown += value;
-			remove => form.MouseDown -= value;
-		}
-		public event MouseEventHandler MouseUp
-		{
-			add => form.MouseUp += value;
-			remove => form.MouseUp -= value;
-		}
-		public event MouseEventHandler MouseWheel
-		{
-			add => form.MouseWheel += value;
-			remove => form.MouseWheel -= value;
-		}
-		public event EventHandler MouseEnter
-		{
-			add => form.MouseEnter += value;
-			remove => form.MouseLeave -= value;
-		}
-		public event EventHandler MouseLeave
-		{
-			add => form.MouseLeave += value;
-			remove => form.MouseLeave -= value;
-		}
-
-		public event KeyEventHandler KeyDown
-		{
-			add => keyDown.KeyDown += value;
-			remove => keyDown.KeyDown -= value;
-		}
-		public event KeyEventHandler KeyPress
-		{
-			add => form.KeyDown += value;
-			remove => form.KeyDown -= value;
-		}
-		public event KeyEventHandler KeyUp
-		{
-			add => form.KeyUp += value;
-			remove => form.KeyUp -= value;
-		}
-
-		public event EventHandler FrameMove
-		{
-			add => form.Move += value;
-			remove => form.Move -= value;
 		}
 
 		public BufferedGraphics CreateBufferedGraphics()
@@ -196,9 +135,9 @@ namespace CodeDrawProject
 			context.Dispose();
 		}
 
-		public static CanvasForm Create(Size size)
+		public static CanvasForm Create(Size size, EventInvokeCollection events)
 		{
-			return GuiRunner.CreateGui(size);
+			return GuiRunner.CreateGui(size, events);
 		}
 
 		public static void Configure()
