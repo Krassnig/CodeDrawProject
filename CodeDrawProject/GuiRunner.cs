@@ -24,7 +24,7 @@ namespace CodeDrawProject
 			thread.SetApartmentState(ApartmentState.STA);
 			thread.Start();
 			canvasIsSet.Wait();
-			if (canvas == null) throw new Exception("LiteDraw is in an invalid state, although gui has been instanciated the gui is still null.");
+			if (canvas == null) throw new Exception("CodeDraw is in an invalid state, although gui has been instanciated the gui is still null.");
 			canvas.WaitForInvocability();
 			return canvas;
 		}

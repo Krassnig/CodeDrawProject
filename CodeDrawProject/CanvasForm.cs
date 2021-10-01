@@ -9,25 +9,15 @@ namespace CodeDrawProject
 	{
 		public CanvasForm(Size size, EventInvokeCollection events)
 		{
-			canvas = new Bitmap(size.Width, size.Height);
-			form = new DoubleBufferedForm();
+			displayBuffer = new CodeDrawGraphics(size.Width, size.Height);
+			form = new DoubleBufferedForm(size);
+			formGraphics = form.CreateGraphics();
 			events.SubscribeEvents(form);
-
-			form.SuspendLayout();
-
-			form.AutoScaleDimensions = new SizeF(7F, 15F);
-			form.AutoScaleMode = AutoScaleMode.Font;
-			form.ClientSize = size;
-			form.Icon = Properties.Resources.CodeDrawIcon;
-			form.MaximizeBox = false;
-			form.FormBorderStyle = FormBorderStyle.FixedSingle;
-
-			form.ResumeLayout(false);
 		}
 
 		private Form form;
-		private Bitmap canvas;
-		private BufferedGraphicsContext context = new BufferedGraphicsContext();
+		private Graphics formGraphics;
+		private CodeDrawGraphics displayBuffer;
 
 		public bool ExitOnLastClose { get; set; } = true;
 
@@ -43,25 +33,20 @@ namespace CodeDrawProject
 			set => InvokeAsync(() => form.DesktopLocation = value);
 		}
 
-		public BufferedGraphics CreateBufferedGraphics()
+		public void Render(CodeDrawGraphics buffer)
 		{
-			return context.Allocate(form.CreateGraphics(), form.DisplayRectangle);
+			CopyToDisplayBuffer(buffer);
+			InvokeSync(() => CopyDisplayBufferToForm());
 		}
 
-		public void Render(BufferedGraphics buffer)
+		public void Render(CodeDrawGraphics buffer, int waitMilliseconds)
 		{
-			CopyToCanvas(buffer);
-			InvokeSync(() => CopyToForm(buffer));
-		}
-
-		public void Render(BufferedGraphics buffer, int waitMilliseconds)
-		{
-			CopyToCanvas(buffer);
+			CopyToDisplayBuffer(buffer);
 
 			using SemaphoreSlim s = new SemaphoreSlim(0);
 			InvokeAsync(() =>
 			{
-				CopyToForm(buffer);
+				CopyDisplayBufferToForm();
 				s.Release();
 			});
 			Thread.Sleep(waitMilliseconds);
@@ -77,19 +62,17 @@ namespace CodeDrawProject
 
 		public void CopyToClipboard()
 		{
-			Clipboard.SetImage(canvas);
+			Clipboard.SetImage(displayBuffer.CopyAsImage());
 		}
 
-		private void CopyToCanvas(BufferedGraphics buffer)
+		private void CopyToDisplayBuffer(CodeDrawGraphics codeDrawBuffer)
 		{
-			using Graphics g1 = Graphics.FromImage(canvas);
-			buffer.Render(g1);
+			codeDrawBuffer.CopyTo(displayBuffer);
 		}
 
-		private void CopyToForm(BufferedGraphics buffer)
+		private void CopyDisplayBufferToForm()
 		{
-			using Graphics g2 = form.CreateGraphics();
-			buffer.Render(g2);
+			displayBuffer.CopyTo(formGraphics);
 		}
 
 		private void InvokeAsync(Action action)
@@ -130,9 +113,9 @@ namespace CodeDrawProject
 
 		public void Dispose()
 		{
-			canvas.Dispose();
+			displayBuffer.Dispose();
 			form.Dispose();
-			context.Dispose();
+			formGraphics.Dispose();
 		}
 
 		public static CanvasForm Create(Size size, EventInvokeCollection events)

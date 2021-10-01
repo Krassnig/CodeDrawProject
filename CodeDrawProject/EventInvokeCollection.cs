@@ -12,16 +12,17 @@ namespace CodeDrawProject
 		public Action<MouseEventArgs>? MouseDown { get; init; }
 		public Action<MouseEventArgs>? MouseUp { get; init; }
 		public Action<MouseEventArgs>? MouseWheel { get; init; }
-		public Action<EventArgs>? MouseEnter { get; init; }
-		public Action<EventArgs>? MouseLeave { get; init; }
+		public Action<MouseEventArgs>? MouseEnter { get; init; }
+		public Action<MouseEventArgs>? MouseLeave { get; init; }
 
-		public Action<KeyPressEventArgs>? KeyPress { get; init; }
+		public Action<KeyEventArgs>? KeyPress { get; init; }
 		public Action<KeyEventArgs>? KeyDown { get; init; }
 		public Action<KeyEventArgs>? KeyUp { get; init; }
 
 		public Action<EventArgs>? WindowMove { get; init; }
 
-		private KeyDownDictionary keyDownDictionary = new KeyDownDictionary();
+		private KeyEventBuilder keyDownBuilder = new KeyEventBuilder();
+		private EnterLeaveEventBuilder mouseEnterLeaveBuilder = new EnterLeaveEventBuilder();
 
 		public void SubscribeEvents(Form form)
 		{
@@ -30,14 +31,19 @@ namespace CodeDrawProject
 			form.MouseDown += (s, a) => MouseDown?.Invoke(a);
 			form.MouseUp += (s, a) => MouseUp?.Invoke(a);
 			form.MouseWheel += (s, a) => MouseWheel?.Invoke(a);
-			form.MouseEnter += (s, a) => MouseEnter?.Invoke(a);
-			form.MouseLeave += (s, a) => MouseLeave?.Invoke(a);
-			form.KeyPress += (s, a) => KeyPress?.Invoke(a);
-			form.KeyDown += keyDownDictionary.KeyDownEventHandler;
-			form.KeyUp += keyDownDictionary.KeyUpEventHandler;
-			keyDownDictionary.KeyDown += (s, a) => KeyDown?.Invoke(a);
-			form.KeyUp += (s, a) => KeyUp?.Invoke(a);
 			form.Move += (s, a) => WindowMove?.Invoke(a);
+
+			form.KeyDown += keyDownBuilder.KeyDownEventHandler;
+			form.KeyUp += keyDownBuilder.KeyUpEventHandler;
+			keyDownBuilder.KeyDown += (s, a) => KeyDown?.Invoke(a);
+			keyDownBuilder.KeyPress += (s, a) => KeyPress?.Invoke(a);
+			keyDownBuilder.KeyUp += (s, a) => KeyUp?.Invoke(a);
+
+			form.MouseEnter += mouseEnterLeaveBuilder.MouseEnterEventHandler;
+			form.MouseLeave += mouseEnterLeaveBuilder.MouseLeaveEventHandler;
+			form.MouseMove += mouseEnterLeaveBuilder.MouseMoveEventHandler;
+			mouseEnterLeaveBuilder.MouseEnter += (s, a) => MouseEnter?.Invoke(a);
+			mouseEnterLeaveBuilder.MouseLeave += (s, a) => MouseLeave?.Invoke(a);
 		}
 	}
 }

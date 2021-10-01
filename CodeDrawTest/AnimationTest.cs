@@ -74,7 +74,7 @@ namespace CodeDrawTest
 			{
 				cd.Clear();
 
-				cd.FillArc(100, 100, 800, 800, Math.Tau / 4, i);
+				cd.FillPie(100, 100, 800, 800, Math.Tau / 4, i);
 				cd.DrawArc(100, 100, 850, 850, Math.Tau / 4, i);
 
 				cd.Show();
@@ -89,14 +89,14 @@ namespace CodeDrawTest
 
 			for (double i = 0; i < Math.Tau; i += inc)
 			{
-				cd.FillArc(300, 300, 100, 100, i, inc);
+				cd.FillPie(300, 300, 100, 100, i, inc);
 				cd.DrawArc(300, 300, 150, 150, i, inc);
 
 				cd.Show(200);
 			}
 
 			cd.Color = Color.Red;
-			cd.FillArc(300, 300, 50, 50, -Math.Tau / 8, Math.Tau / 8);
+			cd.FillPie(300, 300, 50, 50, -Math.Tau / 8, Math.Tau / 8);
 
 			cd.Show();
 		}

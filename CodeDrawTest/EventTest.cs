@@ -58,7 +58,7 @@ namespace CodeDrawTest
 			cd.MouseMove += (cd, args) =>
 			{
 				cd.Clear();
-				cd.DrawBezier((200, 200), (args.X, args.Y), (args.X, args.Y), (400, 400));
+				cd.DrawCurve(200, 200, args.X, args.Y, 400, 400);
 				cd.Show();
 			};
 		}
@@ -79,15 +79,21 @@ namespace CodeDrawTest
 		{
 			CodeDraw cd = new CodeDraw();
 
+			int i = 0;
 			cd.Color = Color.Red;
 			s(cd, (cd, args) =>
 			{
-				cd.FillSquare(args.X - 5, args.Y - 5, 10);
+				cd.Color = Color.White;
+				cd.FillCircle(300, 300, 50);
+				cd.Color = Color.Red;
+				cd.DrawText(300, 300, i++.ToString());
+				cd.FillRectangle(args.X - 10, args.Y - 2, 20, 4);
+				cd.FillRectangle(args.X - 2, args.Y - 10, 4, 20);
 				cd.Show();
 			});
 		}
 
-		private static void KeyPressTest(Action<CodeDraw, CodeDrawProject.EventHandler<KeyPressEventArgs>> s)
+		private static void KeyPressTest(Action<CodeDraw, CodeDrawProject.EventHandler<KeyEventArgs>> s)
 		{
 			CodeDraw cd = new CodeDraw();
 
@@ -98,7 +104,8 @@ namespace CodeDrawTest
 			s(cd, (cd, args) =>
 			{
 				cd.Clear();
-				text += args.KeyChar;
+				string s = (char)args.KeyData + "";
+				text += args.Shift ? s : s.ToLower();
 				cd.DrawText(100, 100, text);
 				cd.Show();
 			});
@@ -145,14 +152,14 @@ namespace CodeDrawTest
 
 		private static int unsubscribeProgress = 0;
 		private static CodeDrawProject.EventHandler<MouseEventArgs>? mouse;
-		private static CodeDrawProject.EventHandler<KeyPressEventArgs>? key;
+		private static CodeDrawProject.EventHandler<KeyEventArgs>? key;
 
 		private static void UnsubscribeTest()
 		{
 			CodeDraw cd = new CodeDraw();
 
 			mouse = new CodeDrawProject.EventHandler<MouseEventArgs>(Unsubscribe_Mouse);
-			key = new CodeDrawProject.EventHandler<KeyPressEventArgs>(Unsubscribe_Key);
+			key = new CodeDrawProject.EventHandler<KeyEventArgs>(Unsubscribe_Key);
 
 			Unsubscribe_Mouse(cd, null);
 		}
@@ -170,7 +177,7 @@ namespace CodeDrawTest
 			cd.KeyPress += key;
 		}
 
-		private static void Unsubscribe_Key(CodeDraw cd, KeyPressEventArgs args)
+		private static void Unsubscribe_Key(CodeDraw cd, KeyEventArgs args)
 		{
 			cd.Clear();
 			cd.Color = Color.Red;

@@ -89,10 +89,10 @@ namespace CodeDrawTest
 			cd.Color = Color.BlueViolet;
 
 			cd.DrawArc(200, 200, 50, 50, 0, Math.PI / 2);
-			cd.FillArc(200, 400, 50, 50, 0, Math.PI * 3 / 2);
+			cd.FillPie(200, 400, 50, 50, 0, Math.PI * 3 / 2);
 
 			cd.DrawArc(400, 200, 50, 50, 0, Math.PI / 2);
-			cd.FillArc(400, 400, 50, 50, 0, Math.PI * 3 / 2);
+			cd.FillPie(400, 400, 50, 50, 0, Math.PI * 3 / 2);
 
 			cd.Color = Color.Orange;
 			cd.DrawRectangle(150, 150, 100, 100);
@@ -100,7 +100,7 @@ namespace CodeDrawTest
 			cd.Color = Color.Red;
 			cd.FillCircle(200, 200, 10);
 
-			cd.AsImage().Save("saved.png");
+			cd.SaveCanvas().Save("saved.png");
 			
 			cd.Show();
 		}

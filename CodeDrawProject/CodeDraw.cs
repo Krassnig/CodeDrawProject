@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace CodeDrawProject
@@ -14,21 +13,11 @@ namespace CodeDrawProject
 			if (canvasWidth < 150) throw new ArgumentOutOfRangeException("The width of the canvas has to be at least 150px.");
 			if (canvasHeight < 1) throw new ArgumentOutOfRangeException("The height of the canvas has to be positive");
 
-			Width = canvasWidth;
-			Height = canvasHeight;
-
 			EventInvokeCollection events = CreateEventInvokeCollection();
-
+			g = new CodeDrawGraphics(canvasWidth, canvasHeight);
 			form = CanvasForm.Create(new Size(Width, Height), events);
-			buffer = form.CreateBufferedGraphics();
-			UpdateBrushes();
-
+			
 			Title = "CodeDraw";
-			Color = Color.Black;
-			LineWidth = 1;
-			IsAntialiased = true;
-
-			Clear();
 			Show();
 
 			KeyDown += (cd, args) =>
@@ -41,11 +30,12 @@ namespace CodeDrawProject
 		}
 
 		private CanvasForm form;
-		private BufferedGraphics buffer;
-		private Graphics G => buffer.Graphics;
+		private CodeDrawGraphics g;
 
-		public int Width { get; private set; }
-		public int Height { get; private set; }
+		public TextFormat TextFormat { get; set; } = new TextFormat();
+
+		public int Width => g.Width;
+		public int Height => g.Height;
 
 		public int FramePositionX
 		{
@@ -64,51 +54,36 @@ namespace CodeDrawProject
 			set => form.Title = value;
 		}
 
-		public Font Font { get; set; } = new Font(new FontFamily("Arial"), 12);
-
-		private Color color = Color.Black;
 		public Color Color
 		{
-			get => color;
-			set { color = value; UpdateBrushes(); }
+			get => g.Color;
+			set => g.Color = value;
 		}
 
-		private double lineWidth = 1;
 		public double LineWidth
 		{
-			get => lineWidth;
+			get => g.LineWidth;
 			set
 			{
-				if (value < 1) throw new ArgumentException($"{nameof(LineWidth)} must be greater than 1.", nameof(LineWidth));
-				lineWidth = value;
-				UpdateBrushes();
+				if (value <= 0) throw CreateArgumentNotNegative(nameof(LineWidth));
+				g.LineWidth = value;
 			}
 		}
 
 		public bool IsAntialiased
 		{
-			get => G.SmoothingMode == SmoothingMode.AntiAlias;
-			set => G.SmoothingMode = value ? SmoothingMode.AntiAlias : SmoothingMode.HighSpeed;
-		}
-
-		private SolidBrush brush = new SolidBrush(Color.Black);
-		private Pen pen = new Pen(Color.Black, 1);
-		private void UpdateBrushes()
-		{
-			brush.Dispose();
-			brush = new SolidBrush(color);
-			pen.Dispose();
-			pen = new Pen(color, (float)lineWidth);
+			get => g.IsAntialiased;
+			set => g.IsAntialiased = value;
 		}
 
 		public event EventHandler<MouseEventArgs>? MouseClick;
 		public event EventHandler<MouseEventArgs>? MouseMove;
 		public event EventHandler<MouseEventArgs>? MouseDown;
 		public event EventHandler<MouseEventArgs>? MouseUp;
-		public event EventHandler<EventArgs>? MouseEnter;
-		public event EventHandler<EventArgs>? MouseLeave;
+		public event EventHandler<MouseEventArgs>? MouseEnter;
+		public event EventHandler<MouseEventArgs>? MouseLeave;
 		public event EventHandler<MouseEventArgs>? MouseWheel;
-		public event EventHandler<KeyPressEventArgs>? KeyPress;
+		public event EventHandler<KeyEventArgs>? KeyPress;
 		public event EventHandler<KeyEventArgs>? KeyUp;
 		public event EventHandler<KeyEventArgs>? KeyDown;
 		public event EventHandler<EventArgs>? WindowMove;
@@ -117,10 +92,10 @@ namespace CodeDrawProject
 		protected virtual void OnMouseMove(MouseEventArgs args) => MouseMove?.Invoke(this, args);
 		protected virtual void OnMouseDown(MouseEventArgs args) => MouseDown?.Invoke(this, args);
 		protected virtual void OnMouseUp(MouseEventArgs args) => MouseUp?.Invoke(this, args);
-		protected virtual void OnMouseEnter(EventArgs args) => MouseEnter?.Invoke(this, args);
-		protected virtual void OnMouseLeave(EventArgs args) => MouseLeave?.Invoke(this, args);
+		protected virtual void OnMouseEnter(MouseEventArgs args) => MouseEnter?.Invoke(this, args);
+		protected virtual void OnMouseLeave(MouseEventArgs args) => MouseLeave?.Invoke(this, args);
 		protected virtual void OnMouseWheel(MouseEventArgs args) => MouseWheel?.Invoke(this, args);
-		protected virtual void OnKeyPress(KeyPressEventArgs args) => KeyPress?.Invoke(this, args);
+		protected virtual void OnKeyPress(KeyEventArgs args) => KeyPress?.Invoke(this, args);
 		protected virtual void OnKeyUp(KeyEventArgs args) => KeyUp?.Invoke(this, args);
 		protected virtual void OnKeyDown(KeyEventArgs args) => KeyDown?.Invoke(this, args);
 		protected virtual void OnWindowMove(EventArgs args) => WindowMove?.Invoke(this, args);
@@ -147,136 +122,128 @@ namespace CodeDrawProject
 		{
 			if (text == null) throw CreateArgumentNull(nameof(text));
 
-			G.DrawString(text, Font, brush, (float)x, (float)y);
+			g.DrawText(x, y, text, TextFormat);
 		}
 
 		public void DrawPixel(double x, double y)
 		{
-			FillSquare(x, y, 1);
+			g.DrawPixel(x, y);
 		}
 
 		public void DrawPoint(double x, double y)
 		{
-			FillCircle(x, y, lineWidth);
+			g.DrawPoint(x, y);
 		}
 
-		public void DrawLine(double startx, double starty, double endx, double endy)
+		public void DrawLine(double startX, double startY, double endX, double endY)
 		{
-			G.DrawLine(pen, (float)startx, (float)starty, (float)endx, (float)endy);
+			g.DrawLine(startX, startY, endX, endY);
 		}
 
-		public void DrawBezier((double, double) start, (double, double) control1, (double, double) control2, (double, double) end)
+		public void DrawCurve(double startX, double startY, double controlX, double controlY, double endX, double endY)
 		{
-			G.DrawBezier(pen, MapToPoint(start), MapToPoint(control1), MapToPoint(control2), MapToPoint(end));
+			g.DrawCurve(startX, startY, controlX, controlY, endX, endY);
 		}
 
-		public void DrawSquare(double x, double y, double sideLength)
+		public void DrawBezier(double startX, double startY, double control1X, double control1Y, double control2X, double control2Y, double endX, double endY)
 		{
-			DrawRectangle(x, y, sideLength, sideLength);
-		}
-
-		public void FillSquare(double x, double y, double sideLength)
-		{
-			FillRectangle(x, y, sideLength, sideLength);
-		}
-
-		public void DrawRectangle(double x, double y, double width, double height)
-		{
-			G.DrawRectangle(pen, (float)x, (float)y, (float)width, (float)height);
-		}
-
-		public void FillRectangle(double x, double y, double width, double height)
-		{
-			G.FillRectangle(brush, (float)x, (float)y, (float)width, (float)height);
-		}
-
-		public void DrawCircle(double x, double y, double radius)
-		{
-			DrawEllipse(x, y, radius, radius);
-		}
-
-		public void FillCircle(double x, double y, double radius)
-		{
-			FillEllipse(x, y, radius, radius);
-		}
-
-		public void DrawEllipse(double x, double y, double horizontalRadius, double verticalRadius)
-		{
-			G.DrawEllipse(
-				pen,
-				(float)(x - horizontalRadius),
-				(float)(y - verticalRadius),
-				(float)(2 * horizontalRadius),
-				(float)(2 * verticalRadius)
-			);
-		}
-
-		public void FillEllipse(double x, double y, double horizontalRadius, double verticalRadius)
-		{
-			G.FillEllipse(
-				brush,
-				(float)(x - horizontalRadius),
-				(float)(y - verticalRadius),
-				(float)(2 * horizontalRadius),
-				(float)(2 * verticalRadius)
-			);
+			g.DrawBezier(startX, startY, control1X, control1Y, control2X, control2Y, endX, endY);
 		}
 
 		public void DrawArc(double x, double y, double horizontalRadius, double verticalRadius, double startRadians, double sweepRadians)
 		{
-			G.DrawArc(
-				pen,
-				(float)(x - horizontalRadius),
-				(float)(y - verticalRadius),
-				(float)(2 * horizontalRadius),
-				(float)(2 * verticalRadius),
-				transformStart(startRadians),
-				transformSweep(sweepRadians)
-			);
+			g.DrawArc(x, y, horizontalRadius, verticalRadius, startRadians, sweepRadians);
 		}
 
-		public void FillArc(double x, double y, double horizontalRadius, double verticalRadius, double startRadians, double sweepRadians)
+		public void DrawSquare(double x, double y, double sideLength)
 		{
-			G.FillPie(
-				brush,
-				(float)(x - horizontalRadius),
-				(float)(y - verticalRadius),
-				(float)(2 * horizontalRadius),
-				(float)(2 * verticalRadius),
-				transformStart(startRadians),
-				transformSweep(sweepRadians)
-			);
+			g.DrawSquare(x, y, sideLength);
+		}
+
+		public void FillSquare(double x, double y, double sideLength)
+		{
+			g.FillSquare(x, y, sideLength);
+		}
+
+		public void DrawRectangle(double x, double y, double width, double height)
+		{
+			g.DrawRectangle(x, y, width, height);
+		}
+
+		public void FillRectangle(double x, double y, double width, double height)
+		{
+			g.FillRectangle(x, y, width, height);
+		}
+
+		public void DrawCircle(double x, double y, double radius)
+		{
+			g.DrawCircle(x, y, radius);
+		}
+
+		public void FillCircle(double x, double y, double radius)
+		{
+			g.FillCircle(x, y, radius);
+		}
+
+		public void DrawEllipse(double x, double y, double horizontalRadius, double verticalRadius)
+		{
+			g.DrawEllipse(x, y, horizontalRadius, verticalRadius);
+		}
+
+		public void FillEllipse(double x, double y, double horizontalRadius, double verticalRadius)
+		{
+			g.FillEllipse(x, y, horizontalRadius, verticalRadius);
+		}
+
+		public void DrawPie(double x, double y, double radius, double startRadians, double sweepRadians)
+		{
+			g.DrawPie(x, y, radius, startRadians, sweepRadians);
+		}
+
+		public void DrawPie(double x, double y, double horizontalRadius, double verticalRadius, double startRadians, double sweepRadians)
+		{
+			g.DrawPie(x, y, horizontalRadius, verticalRadius, startRadians, sweepRadians);
+		}
+
+		public void FillPie(double x, double y, double radius, double startRadians, double sweepRadians)
+		{
+			g.FillPie(x, y, radius, startRadians, sweepRadians);
+		}
+
+		public void FillPie(double x, double y, double horizontalRadius, double verticalRadius, double startRadians, double sweepRadians)
+		{
+			g.FillPie(x, y, horizontalRadius, verticalRadius, startRadians, sweepRadians);
 		}
 
 		public void DrawTriangle(double x1, double y1, double x2, double y2, double x3, double y3)
 		{
-			DrawPolygon((x1, y1), (x2, y2), (x3, y3));
+			g.DrawTriangle(x1, y1, x2, y2, x3, y3);
 		}
 
 		public void FillTriangle(double x1, double y1, double x2, double y2, double x3, double y3)
 		{
-			FillPolygon((x1, y1), (x2, y2), (x3, y3));
+			g.FillTriangle(x1, y1, x2, y2, x3, y3);
 		}
 
 		public void DrawPolygon(params (double, double)[] points)
 		{
 			if (points.Length < 2) throw new ArgumentException("There have to be at least two points to draw a polygon.");
 
-			G.DrawPolygon(pen, MapToPoints(points));
+			g.DrawPolygon(points);
 		}
 
 		public void FillPolygon(params (double, double)[] points)
 		{
 			if (points.Length < 2) throw new ArgumentException("There have to be at least two points to draw a polygon.");
 
-			G.FillPolygon(brush, MapToPoints(points));
+			g.FillPolygon(points);
 		}
 
 		public void DrawImage(double x, double y, Image image)
 		{
 			if (image == null) throw CreateArgumentNull(nameof(image));
 
-			G.DrawImage(image, (float)x, (float)y);
+			g.DrawImage(x, y, image);
 		}
 
 		public void DrawImage(double x, double y, double width, double height, Image image)
@@ -285,48 +252,32 @@ namespace CodeDrawProject
 			if (height < 0) throw CreateArgumentNotNegative(nameof(height));
 			if (image == null) throw CreateArgumentNull(nameof(image));
 
-			G.DrawImage(image, (float)x, (float)y, (float)width, (float)height);
+			g.DrawImage(x, y, width, height, image);
 		}
 
-		public Image AsImage()
+		public Bitmap SaveCanvas()
 		{
-			Bitmap bitmap = new Bitmap(Width, Height);
-			using Graphics graphics = Graphics.FromImage(bitmap);
-			buffer.Render(graphics);
-			return bitmap;
-		}
-
-		public void Transform(Matrix matrix)
-		{
-			G.MultiplyTransform(matrix);
+			return g.CopyAsImage();
 		}
 
 		public void Clear()
 		{
-			Clear(Color.White);
+			g.Clear();
 		}
 
 		public void Clear(Color color)
 		{
-			Color c = Color;
-			bool aa = IsAntialiased;
-
-			IsAntialiased = false;
-			Color = color;
-			FillRectangle(0, 0, Width, Height);
-
-			IsAntialiased = aa;
-			Color = c;
+			g.Clear(color);
 		}
 
 		public void Show()
 		{
-			form.Render(buffer);
+			form.Render(g);
 		}
 
 		public void Show(int waitMilliseconds)
 		{
-			form.Render(buffer, waitMilliseconds);
+			form.Render(g, waitMilliseconds);
 		}
 
 		public void Dispose()
@@ -336,42 +287,8 @@ namespace CodeDrawProject
 
 		public void Dispose(bool exit)
 		{
-			brush.Dispose();
-			pen.Dispose();
-			Font.Dispose();
+			g.Dispose();
 			form.CloseAndDispose(exit);
-		}
-
-		private static float transformStart(double startRadians)
-		{
-			return (float)ToDegrees(startRadians - Math.PI / 2);
-		}
-
-		private static float transformSweep(double sweepRadians)
-		{
-			return (float)ToDegrees(sweepRadians);
-		}
-
-		private static double ToDegrees(double Radians)
-		{
-			return Radians * (180 / Math.PI);
-		}
-
-		private static PointF[] MapToPoints((double, double)[] tuples)
-		{
-			PointF[] result = new PointF[tuples.Length];
-
-			for (int i = 0; i < result.Length; i++)
-			{
-				result[i] = MapToPoint(tuples[i]);
-			}
-
-			return result;
-		}
-
-		private static PointF MapToPoint((double, double) tuple)
-		{
-			return new PointF((float)tuple.Item1, (float)tuple.Item2);
 		}
 
 		private static NullReferenceException CreateArgumentNull(string argumentName)
